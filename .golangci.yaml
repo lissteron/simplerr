@@ -1,0 +1,14 @@
+run:
+  tests: false
+  skip-dirs:
+  - scripts
+linters:
+  enable-all: true
+linters-settings:
+  gocritic:
+    enabled-tags:
+      - style
+      - experimental
+      - performance
+      - diagnostic
+      - opinionated
