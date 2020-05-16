@@ -21,14 +21,6 @@ type withCode struct {
 	stack []Call
 }
 
-func GetStack(err error) []Call {
-	if e, ok := err.(*withCode); ok {
-		return e.stack
-	}
-
-	return nil
-}
-
 func (e *withCode) Unwrap() error {
 	return e.err
 }
@@ -39,6 +31,22 @@ func (e *withCode) Error() string {
 	}
 
 	return strings.Join([]string{e.msg, e.err.Error()}, ": ")
+}
+
+func GetStack(err error) []Call {
+	if e, ok := err.(*withCode); ok {
+		return e.stack
+	}
+
+	return nil
+}
+
+func GetCode(err error) int64 {
+	if e, ok := err.(*withCode); ok {
+		return e.code
+	}
+
+	return 0
 }
 
 func WrapWithCode(err error, code int64, msg string) error {

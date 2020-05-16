@@ -376,6 +376,46 @@ func TestGetStack(t *testing.T) {
 	}
 }
 
+func TestGetCode(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name string
+		args args
+		want int64
+	}{
+		{
+			name: "pass",
+			args: args{
+				err: &withCode{code: 42},
+			},
+			want: 42,
+		},
+		{
+			name: "zero",
+			args: args{
+				err: errors.New("t1"),
+			},
+			want: 0,
+		},
+		{
+			name: "zero2",
+			args: args{
+				err: nil,
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetCode(tt.args.err); got != tt.want {
+				t.Errorf("GetCode() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func BenchmarkHasCode(b *testing.B) {
 	err := WrapWithCode(errors.New("t1"), 12, "asd")
 
