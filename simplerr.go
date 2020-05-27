@@ -52,9 +52,11 @@ func GetCode(err error) int64 {
 func GetText(err error) string {
 	if e, ok := err.(*withCode); ok {
 		return e.msg
+	} else if err != nil {
+		return err.Error()
 	}
 
-	return err.Error()
+	return ""
 }
 
 func WrapWithCode(err error, code int64, msg string) error {
