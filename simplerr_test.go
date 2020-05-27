@@ -479,3 +479,43 @@ func BenchmarkError1000(b *testing.B) {
 		_ = err.Error()
 	}
 }
+
+func TestGetText(t *testing.T) {
+	type args struct {
+		err error
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "pass",
+			args: args{
+				err: &withCode{msg: "42"},
+			},
+			want: "42",
+		},
+		{
+			name: "zero",
+			args: args{
+				err: errors.New("t1"),
+			},
+			want: "t1",
+		},
+		{
+			name: "zero2",
+			args: args{
+				err: nil,
+			},
+			want: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetText(tt.args.err); got != tt.want {
+				t.Errorf("GetText() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
