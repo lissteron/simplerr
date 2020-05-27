@@ -124,7 +124,7 @@ func Test_withCode_Error(t *testing.T) {
 	type fields struct {
 		err  error
 		msg  string
-		code int64
+		code int
 	}
 	tests := []struct {
 		name   string
@@ -185,7 +185,7 @@ func Test_withCode_Error(t *testing.T) {
 func TestHasCode(t *testing.T) {
 	type args struct {
 		err  error
-		code int64
+		code int
 	}
 	tests := []struct {
 		name string
@@ -383,7 +383,7 @@ func TestGetCode(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want int64
+		want int
 	}{
 		{
 			name: "pass",
@@ -427,8 +427,8 @@ func BenchmarkHasCode(b *testing.B) {
 func BenchmarkHasCode100(b *testing.B) {
 	err := WrapWithCode(errors.New("t1"), 9999, "-1")
 
-	for i := int64(0); i < 100; i++ {
-		err = WrapWithCode(err, i, strconv.FormatInt(i, 10))
+	for i := 0; i < 100; i++ {
+		err = WrapWithCode(err, i, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -439,8 +439,8 @@ func BenchmarkHasCode100(b *testing.B) {
 func BenchmarkHasCode1000(b *testing.B) {
 	err := WrapWithCode(errors.New("t1"), 9999, "-1")
 
-	for i := int64(0); i < 1000; i++ {
-		err = WrapWithCode(err, i, strconv.FormatInt(i, 10))
+	for i := 0; i < 1000; i++ {
+		err = WrapWithCode(err, i, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -459,8 +459,8 @@ func BenchmarkError(b *testing.B) {
 func BenchmarkError100(b *testing.B) {
 	err := WrapWithCode(errors.New("t1"), 9999, "-1")
 
-	for i := int64(0); i < 100; i++ {
-		err = WrapWithCode(err, i, strconv.FormatInt(i, 10))
+	for i := 0; i < 100; i++ {
+		err = WrapWithCode(err, i, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -471,8 +471,8 @@ func BenchmarkError100(b *testing.B) {
 func BenchmarkError1000(b *testing.B) {
 	err := WrapWithCode(errors.New("t1"), 9999, "-1")
 
-	for i := int64(0); i < 1000; i++ {
-		err = WrapWithCode(err, i, strconv.FormatInt(i, 10))
+	for i := 0; i < 1000; i++ {
+		err = WrapWithCode(err, i, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {

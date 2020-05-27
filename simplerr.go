@@ -17,7 +17,7 @@ type Call struct {
 type withCode struct {
 	err   error
 	msg   string
-	code  int64
+	code  int
 	stack []Call
 }
 
@@ -41,7 +41,7 @@ func GetStack(err error) []Call {
 	return nil
 }
 
-func GetCode(err error) int64 {
+func GetCode(err error) int {
 	if e, ok := err.(*withCode); ok {
 		return e.code
 	}
@@ -59,7 +59,7 @@ func GetText(err error) string {
 	return ""
 }
 
-func WrapWithCode(err error, code int64, msg string) error {
+func WrapWithCode(err error, code int, msg string) error {
 	return &withCode{
 		err:   err,
 		msg:   msg,
@@ -68,7 +68,7 @@ func WrapWithCode(err error, code int64, msg string) error {
 	}
 }
 
-func WrapfWithCode(err error, code int64, tmpl string, args ...interface{}) error {
+func WrapfWithCode(err error, code int, tmpl string, args ...interface{}) error {
 	return &withCode{
 		err:   err,
 		msg:   fmt.Sprintf(tmpl, args...),
@@ -93,7 +93,7 @@ func Is(err, target error) bool {
 	return errors.Is(err, target)
 }
 
-func HasCode(err error, code int64) bool {
+func HasCode(err error, code int) bool {
 	for {
 		if e, ok := err.(*withCode); ok {
 			if e.code == code {
