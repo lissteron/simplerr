@@ -49,6 +49,14 @@ func GetCode(err error) int64 {
 	return 0
 }
 
+func GetText(err error) string {
+	if e, ok := err.(*withCode); ok {
+		return e.msg
+	}
+
+	return ""
+}
+
 func WrapWithCode(err error, code int64, msg string) error {
 	return &withCode{
 		err:   err,
