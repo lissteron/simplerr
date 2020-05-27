@@ -54,7 +54,7 @@ func GetText(err error) string {
 		return e.msg
 	}
 
-	return ""
+	return err.Error()
 }
 
 func WrapWithCode(err error, code int64, msg string) error {
