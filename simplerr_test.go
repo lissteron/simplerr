@@ -519,3 +519,41 @@ func TestGetText(t *testing.T) {
 		})
 	}
 }
+
+func TestWithCode(t *testing.T) {
+	err := errors.New("t1")
+
+	type args struct {
+		err  error
+		code int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "pass",
+			args: args{
+				err:  err,
+				code: 42,
+			},
+			wantErr: true,
+		},
+		{
+			name: "zero",
+			args: args{
+				err:  nil,
+				code: 42,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := WithCode(tt.args.err, tt.args.code); (err != nil) != tt.wantErr {
+				t.Errorf("WithCode() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

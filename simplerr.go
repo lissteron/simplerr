@@ -59,6 +59,14 @@ func GetText(err error) string {
 	return ""
 }
 
+func WithCode(err error, code int) error {
+	return &withCode{
+		err:   err,
+		code:  code,
+		stack: makeStack(),
+	}
+}
+
 func WrapWithCode(err error, code int, msg string) error {
 	return &withCode{
 		err:   err,
