@@ -17,7 +17,7 @@ type Call struct {
 type withCode struct {
 	err   error
 	msg   string
-	code  int
+	code  ErrCodeInterface
 	stack []Call
 }
 
@@ -41,12 +41,12 @@ func GetStack(err error) []Call {
 	return nil
 }
 
-func GetCode(err error) int {
+func GetCode(err error) ErrCodeInterface {
 	if e, ok := err.(*withCode); ok {
 		return e.code
 	}
 
-	return 0
+	return new(ErrCode)
 }
 
 func GetText(err error) string {
@@ -59,7 +59,7 @@ func GetText(err error) string {
 	return ""
 }
 
-func WithCode(err error, code int) error {
+func WithCode(err error, code ErrCodeInterface) error {
 	return &withCode{
 		err:   err,
 		code:  code,
@@ -67,7 +67,7 @@ func WithCode(err error, code int) error {
 	}
 }
 
-func WrapWithCode(err error, code int, msg string) error {
+func WrapWithCode(err error, code ErrCodeInterface, msg string) error {
 	return &withCode{
 		err:   err,
 		msg:   msg,
@@ -76,7 +76,7 @@ func WrapWithCode(err error, code int, msg string) error {
 	}
 }
 
-func WrapfWithCode(err error, code int, tmpl string, args ...interface{}) error {
+func WrapfWithCode(err error, code ErrCodeInterface, tmpl string, args ...interface{}) error {
 	return &withCode{
 		err:   err,
 		msg:   fmt.Sprintf(tmpl, args...),
@@ -86,11 +86,11 @@ func WrapfWithCode(err error, code int, tmpl string, args ...interface{}) error 
 }
 
 func Wrap(err error, msg string) error {
-	return WrapWithCode(err, 0, msg)
+	return WrapWithCode(err, new(ErrCode), msg)
 }
 
 func Wrapf(err error, tmpl string, args ...interface{}) error {
-	return WrapfWithCode(err, 0, tmpl, args...)
+	return WrapfWithCode(err, new(ErrCode), tmpl, args...)
 }
 
 func Is(err, target error) bool {
@@ -101,10 +101,10 @@ func Is(err, target error) bool {
 	return errors.Is(err, target)
 }
 
-func HasCode(err error, code int) bool {
+func HasCode(err error, code ErrCodeInterface) bool {
 	for {
 		if e, ok := err.(*withCode); ok {
-			if e.code == code {
+			if e.code.Int() == code.Int() {
 				return true
 			}
 		}
