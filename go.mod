@@ -1,3 +1,3 @@
 module github.com/lissteron/simplerr
 
-go 1.14
+go 1.15
