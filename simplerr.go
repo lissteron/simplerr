@@ -117,6 +117,22 @@ func HasCode(err error, code ErrCodeInterface) bool {
 	return false
 }
 
+func GetWithCode(err error) error {
+	for {
+		if e, ok := err.(*withCode); ok {
+			if e.code.Int() >= 0 {
+				return e
+			}
+		}
+
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+	}
+
+	return nil
+}
+
 func makeStack() []Call {
 	stack := make([]Call, 0)
 
