@@ -120,7 +120,7 @@ func HasCode(err error, code ErrCodeInterface) bool {
 func GetWithCode(err error) error {
 	for {
 		if e, ok := err.(*withCode); ok {
-			if e.code.Int() >= 0 {
+			if e.code.Int() > 0 {
 				return e
 			}
 		}
