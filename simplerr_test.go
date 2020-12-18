@@ -333,7 +333,7 @@ func TestGetStack(t *testing.T) {
 		{
 			name: "pass",
 			args: args{
-				err: &withCode{
+				err: &withStack{
 					stack: []Call{
 						{
 							Line:     12,
