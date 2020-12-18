@@ -8,17 +8,10 @@ import (
 	"strings"
 )
 
-type Call struct {
-	Line     int
-	File     string
-	FuncName string
-}
-
 type withCode struct {
-	err   error
-	msg   string
-	code  ErrCodeInterface
-	stack []Call
+	err  error
+	msg  string
+	code ErrCodeInterface
 }
 
 func (e *withCode) Unwrap() error {
@@ -30,11 +23,15 @@ func (e *withCode) Error() string {
 		return ""
 	}
 
+	if e.msg == "" {
+		return e.err.Error()
+	}
+
 	return strings.Join([]string{e.msg, e.err.Error()}, ": ")
 }
 
 func GetStack(err error) []Call {
-	if e, ok := err.(*withCode); ok {
+	if e, ok := err.(*withStack); ok {
 		return e.stack
 	}
 
@@ -61,27 +58,24 @@ func GetText(err error) string {
 
 func WithCode(err error, code ErrCodeInterface) error {
 	return &withCode{
-		err:   err,
-		code:  code,
-		stack: makeStack(),
+		err:  err,
+		code: code,
 	}
 }
 
 func WrapWithCode(err error, code ErrCodeInterface, msg string) error {
 	return &withCode{
-		err:   err,
-		msg:   msg,
-		code:  code,
-		stack: makeStack(),
+		err:  err,
+		msg:  msg,
+		code: code,
 	}
 }
 
 func WrapfWithCode(err error, code ErrCodeInterface, tmpl string, args ...interface{}) error {
 	return &withCode{
-		err:   err,
-		msg:   fmt.Sprintf(tmpl, args...),
-		code:  code,
-		stack: makeStack(),
+		err:  err,
+		msg:  fmt.Sprintf(tmpl, args...),
+		code: code,
 	}
 }
 
@@ -132,6 +126,29 @@ func GetWithCode(err error) error {
 
 	return nil
 }
+
+type Call struct {
+	Line     int
+	File     string
+	FuncName string
+}
+
+// WithStack annotates err with a stack trace at the point WithStack was called.
+// If err is nil, WithStack returns nil.
+func WithStack(err error) error {
+	return &withStack{
+		error: err,
+		stack: makeStack(),
+	}
+}
+
+type withStack struct {
+	error
+	stack []Call
+}
+
+// Unwrap provides compatibility for Go 1.13 error chains.
+func (w *withStack) Unwrap() error { return w.error }
 
 func makeStack() []Call {
 	stack := make([]Call, 0)
