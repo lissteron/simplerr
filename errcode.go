@@ -8,14 +8,14 @@ type ErrCodeInterface interface {
 
 type ErrCode int
 
-func (e *ErrCode) HTTP() int {
-	return int(*e)
+func (e ErrCode) HTTP() int {
+	return int(e)
 }
 
-func (e *ErrCode) GRPC() int {
-	return int(*e)
+func (e ErrCode) GRPC() int {
+	return int(e)
 }
 
-func (e *ErrCode) Int() int {
-	return int(*e)
+func (e ErrCode) Int() int {
+	return int(e)
 }
