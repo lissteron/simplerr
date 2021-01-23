@@ -121,12 +121,12 @@ func TestIs(t *testing.T) {
 }
 
 func Test_withCode_Error(t *testing.T) {
-	errCode := ErrCode(42)
+	errCode := InternalCode(42)
 
 	type fields struct {
 		err  error
 		msg  string
-		code ErrCodeInterface
+		code ErrCode
 	}
 	tests := []struct {
 		name   string
@@ -138,7 +138,7 @@ func Test_withCode_Error(t *testing.T) {
 			fields: fields{
 				err:  errors.New("t1"),
 				msg:  "t2",
-				code: &errCode,
+				code: errCode,
 			},
 			want: "t2: t1",
 		},
@@ -147,7 +147,7 @@ func Test_withCode_Error(t *testing.T) {
 			fields: fields{
 				err:  &withCode{err: errors.New("t1"), msg: "t2"},
 				msg:  "t3",
-				code: &errCode,
+				code: errCode,
 			},
 			want: "t3: t2: t1",
 		},
@@ -156,7 +156,7 @@ func Test_withCode_Error(t *testing.T) {
 			fields: fields{
 				err:  &withCode{err: nil, msg: "t2"},
 				msg:  "t3",
-				code: &errCode,
+				code: errCode,
 			},
 			want: "t3: ",
 		},
@@ -165,7 +165,7 @@ func Test_withCode_Error(t *testing.T) {
 			fields: fields{
 				err:  nil,
 				msg:  "t3",
-				code: &errCode,
+				code: errCode,
 			},
 			want: "",
 		},
@@ -186,15 +186,15 @@ func Test_withCode_Error(t *testing.T) {
 
 func TestHasCode(t *testing.T) {
 	var (
-		errCode  = ErrCode(42)
-		errCode2 = ErrCode(24)
-		errCode3 = ErrCode(424)
-		errCode4 = ErrCode(42)
+		errCode  = InternalCode(42)
+		errCode2 = InternalCode(24)
+		errCode3 = InternalCode(424)
+		errCode4 = InternalCode(42)
 	)
 
 	type args struct {
 		err  error
-		code ErrCodeInterface
+		code ErrCode
 	}
 	tests := []struct {
 		name string
@@ -204,16 +204,16 @@ func TestHasCode(t *testing.T) {
 		{
 			name: "true",
 			args: args{
-				err:  &withCode{err: errors.New("t1"), msg: "t2", code: &errCode},
-				code: &errCode4,
+				err:  &withCode{err: errors.New("t1"), msg: "t2", code: errCode},
+				code: errCode4,
 			},
 			want: true,
 		},
 		{
 			name: "true2",
 			args: args{
-				err:  &withCode{err: &withCode{err: errors.New("t1"), msg: "t2", code: &errCode}, msg: "t2", code: &errCode2},
-				code: &errCode4,
+				err:  &withCode{err: &withCode{err: errors.New("t1"), msg: "t2", code: errCode}, msg: "t2", code: errCode2},
+				code: errCode4,
 			},
 			want: true,
 		},
@@ -221,7 +221,7 @@ func TestHasCode(t *testing.T) {
 			name: "false",
 			args: args{
 				err:  errors.New("t1"),
-				code: &errCode4,
+				code: errCode4,
 			},
 			want: false,
 		},
@@ -229,23 +229,23 @@ func TestHasCode(t *testing.T) {
 			name: "false2",
 			args: args{
 				err:  nil,
-				code: &errCode4,
+				code: errCode4,
 			},
 			want: false,
 		},
 		{
 			name: "false3",
 			args: args{
-				err:  &withCode{err: &withCode{err: errors.New("t1"), msg: "t2", code: &errCode3}, msg: "t2", code: &errCode2},
-				code: &errCode4,
+				err:  &withCode{err: &withCode{err: errors.New("t1"), msg: "t2", code: errCode3}, msg: "t2", code: errCode2},
+				code: errCode4,
 			},
 			want: false,
 		},
 		{
 			name: "false4",
 			args: args{
-				err:  &withCode{err: nil, msg: "t2", code: &errCode2},
-				code: &errCode4,
+				err:  &withCode{err: nil, msg: "t2", code: errCode2},
+				code: errCode4,
 			},
 			want: false,
 		},
@@ -387,9 +387,9 @@ func TestGetStack(t *testing.T) {
 
 func TestGetCode(t *testing.T) {
 	var (
-		errCode  = ErrCode(42)
-		errCode2 = new(ErrCode)
-		errCode3 = ErrCode(42)
+		errCode  = InternalCode(42)
+		errCode2 = new(code)
+		errCode3 = InternalCode(42)
 	)
 
 	type args struct {
@@ -398,14 +398,14 @@ func TestGetCode(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want ErrCodeInterface
+		want ErrCode
 	}{
 		{
 			name: "pass",
 			args: args{
-				err: &withCode{code: &errCode},
+				err: &withCode{code: errCode},
 			},
-			want: &errCode3,
+			want: errCode3,
 		},
 		{
 			name: "zero",
@@ -432,49 +432,49 @@ func TestGetCode(t *testing.T) {
 }
 
 func BenchmarkHasCode(b *testing.B) {
-	errCode := ErrCode(42)
+	errCode := InternalCode(42)
 
-	err := WrapWithCode(errors.New("t1"), &errCode, "asd")
+	err := WrapWithCode(errors.New("t1"), errCode, "asd")
 
 	for i := 0; i < b.N; i++ {
-		HasCode(err, &errCode)
+		HasCode(err, errCode)
 	}
 }
 
 func BenchmarkHasCode100(b *testing.B) {
-	errCode := ErrCode(9999)
+	errCode := InternalCode(9999)
 
-	err := WrapWithCode(errors.New("t1"), &errCode, "-1")
+	err := WrapWithCode(errors.New("t1"), errCode, "-1")
 
 	for i := 0; i < 100; i++ {
-		errCode2 := ErrCode(i)
-		err = WrapWithCode(err, &errCode2, strconv.Itoa(i))
+		errCode2 := InternalCode(i)
+		err = WrapWithCode(err, errCode2, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {
-		HasCode(err, &errCode)
+		HasCode(err, errCode)
 	}
 }
 
 func BenchmarkHasCode1000(b *testing.B) {
-	errCode := ErrCode(9999)
+	errCode := InternalCode(9999)
 
-	err := WrapWithCode(errors.New("t1"), &errCode, "-1")
+	err := WrapWithCode(errors.New("t1"), errCode, "-1")
 
 	for i := 0; i < 1000; i++ {
-		errCode2 := ErrCode(i)
-		err = WrapWithCode(err, &errCode2, strconv.Itoa(i))
+		errCode2 := InternalCode(i)
+		err = WrapWithCode(err, errCode2, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {
-		HasCode(err, &errCode)
+		HasCode(err, errCode)
 	}
 }
 
 func BenchmarkError(b *testing.B) {
-	errCode := ErrCode(9999)
+	errCode := InternalCode(9999)
 
-	err := WrapWithCode(errors.New("t1"), &errCode, "-1")
+	err := WrapWithCode(errors.New("t1"), errCode, "-1")
 
 	for i := 0; i < b.N; i++ {
 		_ = err.Error()
@@ -482,13 +482,13 @@ func BenchmarkError(b *testing.B) {
 }
 
 func BenchmarkError100(b *testing.B) {
-	errCode := ErrCode(9999)
+	errCode := InternalCode(9999)
 
-	err := WrapWithCode(errors.New("t1"), &errCode, "-1")
+	err := WrapWithCode(errors.New("t1"), errCode, "-1")
 
 	for i := 0; i < 100; i++ {
-		errCode2 := ErrCode(i)
-		err = WrapWithCode(err, &errCode2, strconv.Itoa(i))
+		errCode2 := InternalCode(i)
+		err = WrapWithCode(err, errCode2, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -497,13 +497,13 @@ func BenchmarkError100(b *testing.B) {
 }
 
 func BenchmarkError1000(b *testing.B) {
-	errCode := ErrCode(9999)
+	errCode := InternalCode(9999)
 
-	err := WrapWithCode(errors.New("t1"), &errCode, "-1")
+	err := WrapWithCode(errors.New("t1"), errCode, "-1")
 
 	for i := 0; i < 1000; i++ {
-		errCode2 := ErrCode(i)
-		err = WrapWithCode(err, &errCode2, strconv.Itoa(i))
+		errCode2 := InternalCode(i)
+		err = WrapWithCode(err, errCode2, strconv.Itoa(i))
 	}
 
 	for i := 0; i < b.N; i++ {
@@ -552,13 +552,13 @@ func TestGetText(t *testing.T) {
 }
 
 func TestWithCode(t *testing.T) {
-	errCode := ErrCode(42)
+	errCode := InternalCode(42)
 
 	err := errors.New("t1")
 
 	type args struct {
 		err  error
-		code ErrCodeInterface
+		code ErrCode
 	}
 	tests := []struct {
 		name    string
@@ -569,7 +569,7 @@ func TestWithCode(t *testing.T) {
 			name: "pass",
 			args: args{
 				err:  err,
-				code: &errCode,
+				code: errCode,
 			},
 			wantErr: true,
 		},
@@ -577,7 +577,7 @@ func TestWithCode(t *testing.T) {
 			name: "zero",
 			args: args{
 				err:  nil,
-				code: &errCode,
+				code: errCode,
 			},
 			wantErr: true,
 		},
