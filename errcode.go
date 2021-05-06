@@ -6,6 +6,7 @@ import (
 
 // grpc codes from google.golang.org/grpc@v1.34.0/codes/codes.go
 const (
+	grpcInvalidArgument  int = 3
 	grpcNotFound         int = 5
 	grpcAlreadyExists    int = 6
 	grpcPermissionDenied int = 7
@@ -24,6 +25,14 @@ type code struct{ http, grpc, code int }
 func (c *code) HTTP() int { return c.http }
 func (c *code) GRPC() int { return c.grpc }
 func (c *code) Int() int  { return c.code }
+
+func InvalidArgumentCode(c int) ErrCode {
+	return &code{
+		http: http.StatusBadRequest,
+		grpc: grpcInvalidArgument,
+		code: c,
+	}
+}
 
 func NotFoundCode(c int) ErrCode {
 	return &code{
